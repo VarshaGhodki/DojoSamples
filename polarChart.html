@@ -1,0 +1,261 @@
+<html lang="en">
+<head>
+<title>Spider 2D</title>
+
+
+  <script src="https://jsdev.arcgis.com/3.16/"></script>
+<style>
+.jimu-widget-RelatedTableCharts-layout .esriCTLegendContainer .dijitCheckBox
+{
+    margin: 1px;
+}
+.jimu-widget-RelatedTableCharts-layout .dojoxLegendNode td
+{
+    padding: 6px 4px 6px 6px;
+}
+.jimu-widget-RelatedTableCharts-layout .dojoxLegendNode
+{
+    background-color: #F7F7F7;
+    border: 1px solid #CCCCCC;
+    margin: 0;
+    padding: 0;
+}
+.jimu-widget-RelatedTableCharts-layout .dojoxLegendText
+{
+   
+}
+#legend1{
+width: calc(100% - 10px);
+overflow-x:auto;
+}
+.dojoxLegendIcon ,.dijitCheckBox{
+display:inline-block;
+}
+</style>
+<script type="text/javascript">
+	var switchData, switchSpider, switchDivisions, switchAnimation;
+
+	require(["dojo/_base/kernel", "dojo/dom", "dojo/dom-construct", "dojo/ready", "dojox/charting/Chart", "dojox/charting/plot2d/Spider", "dojox/charting/themes/PlotKit/blue",
+		"dojox/charting/action2d/Tooltip", "dojox/charting/action2d/Magnify","dojox/charting/action2d/Highlight",
+		"dijit/form/CheckBox", "dijit/form/RadioButton", "dojox/charting/widget/SelectableLegend"
+		],
+			function(kernel, dom, domConstruct, ready, Chart, Spider, blue, Tooltip,  Magnify,Highlight, CheckBox,
+					 RadioButton,  SelectableLegend){
+
+	var divisions = 7,
+		stype = "polygon";
+	var empty = {};
+	var chart1, legend1;
+
+
+ready(function(){
+var chartSeries= [{
+		"1746": {
+			"data": {
+				"AREA": 1856.9199,
+				"POP1990": 3301,
+				"POP2000": 2871,
+				"POP90_SQMI": 2
+			},
+			  
+				"fill": "#bc69dd"
+			
+	}
+	}, {
+		"1750": {
+			"data": {
+				"AREA": 1842.6887,
+				"POP1990": 6023,
+				"POP2000": 6032,
+				"POP90_SQMI": 3
+			},		
+				"fill": "#7ce284"
+			
+		}
+	}, {
+		"1822": {
+			"data": {
+				"AREA": 1242.7585,
+				"POP1990": 4497,
+				"POP2000": 4175,
+				"POP90_SQMI": 4
+			},
+				"fill": "#ee2020"
+			
+		}
+	}, {
+		"1952": {
+			"data": {
+				"AREA": 1145.5974,
+				"POP1990": 4147,
+				"POP2000": 3575,
+				"POP90_SQMI": 4
+			},
+			
+				"fill": "#ee2020"
+			
+		}
+	}, {
+		"1754": {
+			"data": {
+				"AREA": 1036.0417,
+				"POP1990": 4063,
+				"POP2000": 3546,
+				"POP90_SQMI": 4
+			},
+			
+				"fill": "#ee2020"
+			
+		}
+	}];
+	var chartNodeDiv,chart1;
+		function createChart(){
+			if(chart1){
+			chart1.destroy();
+			chart1=null;
+			}
+			domConstruct.empty(dom.byId("test1"));			
+       if(chartNodeDiv){
+			domConstruct.empty(chartNodeDiv);}
+	       chartNodeDiv = domConstruct.create("div", {
+             "style": "width:100%; height:100%; overflow:hidden"
+           }, "test1");
+		chart1 = new Chart(chartNodeDiv,{"id":"myChart"});
+		//chart1.
+		//chart1.setTheme(blue);
+		/*chart1.addPlot("default", {
+			type: Spider,
+			labelOffset: -10,
+			divisions: divisions,
+			axisColor:      "lightgray",
+			spiderColor:    "silver",
+            seriesFillAlpha: 1,
+			spiderOrigin:	 0.16,
+			markerSize:  	 3,
+			precision:		 0,
+			spiderType:	 	 stype
+		//	animate :false
+		});*/
+      chart1.addPlot("default", {
+        type: Spider,
+        labelOffset: -10,
+        divisions: 5,
+        seriesFillAlpha: .9,
+        markerSize: 3,
+        precision: 0,
+        spiderType: "polygon"
+      });
+		
+		//  chart1.addAxis("GDP", { type: Base, min: 0, max: 5 });
+  //chart1.addSeries("A", {data: {"GDP": 2, "area": 6, "population": 2000, },labelKey: "population"}, { fill: "blue" , legend: "A" });
+ // chart1.addSeries("B", {data: {"GDP": 3, "area": 20, "population": 1500 },labelKey: "population"}, { fill: "green", legend: "A" });
+		 for (i = 0; i < chartSeries.length; i++) {
+       var dataObj = chartSeries[i];
+        for (key in dataObj) {
+          if (dataObj.hasOwnProperty(key)) {
+      
+			if (dataObj[key].fill) {
+              chart1.addSeries(key, dataObj[key], {
+                fill: dataObj[key].fill
+              });
+            } else {
+              chart1.addSeries(key, dataObj[key]);
+            }
+            console.log(key+" fill:"+ dataObj[key].fill);
+            console.log(dataObj[key]);
+          }
+        }
+      }
+	new Tooltip(chart1);
+		//new Highlight(chart1);
+       // new Magnify(chart1, "default", {duration: 800, scale: 1.5});
+		chart1.render();		
+		if(this.legendNode){
+		this.legendNode.destroy();
+		this.legendNode=null;
+		}
+	domConstruct.empty(dom.byId("legend1"));
+		this.legendNode = new SelectableLegend({chart: chart1, horizontal: true}, domConstruct.create("div", {}, "legend1"));
+		}
+	/*	
+		function _createPolarChart()  {
+      var chartNodeDiv, chart, key, fontFamily, seriesFillAlphaValue = 1, dataObj, i;
+      domConstruct.empty(this.chartContainer);
+      chartNodeDiv = domConstruct.create("div", {
+        "style": "width:100%; height:100%; overflow:hidden"
+      }, this.chartContainer);
+      fontFamily = domStyle.get(this.chartDescription, "fontFamily");
+      chart = new Chart(chartNodeDiv);
+      //set polygon opacity for polar chart if 'polygonFill' is set to true in config
+      if (!this.config.chartConfig.showPolygonFill) {
+        seriesFillAlphaValue = 0;
+      }
+	  
+      chart.addPlot("default", {
+        type: Spider,
+        labelOffset: -10,
+        divisions: 5,
+        seriesFillAlpha: seriesFillAlphaValue,
+        markerSize: 3,
+        precision: 0,
+        spiderType: "polygon",
+        axisFont: "normal normal normal 9px/25px" + ' ' + fontFamily
+      });
+
+      //If theme is selected, apply the same on chart
+      if (this.config.chartData.selectedTheme) {
+        chart.setTheme(this.config.chartData.selectedTheme);
+      }
+      //add series to chart
+      for (i = 0; i < this.config.chartData.chartSeries.length; i++) {
+        dataObj = this.config.chartData.chartSeries[i];
+        for (key in dataObj) {
+          if (dataObj.hasOwnProperty(key)) {
+            if (this.config.chartData.fill) {
+              //set chart series Properties
+              //If the fill color is specified then apply it
+              chart.addSeries(key, dataObj[key], {
+                fill: this.config.chartData.fill
+              });
+            } else if (dataObj[key].fill) {
+              chart.addSeries(key, dataObj[key], {
+                fill: dataObj[key].fill
+              });
+            } else {
+              chart.addSeries(key, dataObj[key]);
+            }
+            console.log(key+" fill:"+ dataObj[key].fill);
+            console.log(dataObj[key]);
+          }
+        }
+      }
+      //if chart is not for preview then set tooltips
+      if (!this.config.isPreview) {
+        new Tooltip(chart);
+      }
+  //    new Highlight(chart);
+      //new Magnify(chart, "default", { duration: 800, scale: 1.5 });
+      chart.render();
+      this.chart = chart;
+      this._createChartLegend(chart);
+      this.onChartCreated();
+    }
+		*/
+		createChart();
+	//	setTimeout(function(){createChart();},3000);
+		
+		// prepare and enable controls
+       // populateSelect("dojo.fx.easing", "easing");
+	});
+});
+</script>
+
+</head>
+<body class="claro jimu-widget-RelatedTableCharts-layout">
+
+
+<div id="test1" style="width: 400px; height: 400px;"></div>
+<div id="legend1"></div>
+
+</body>
+</html>
